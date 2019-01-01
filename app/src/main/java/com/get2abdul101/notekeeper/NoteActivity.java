@@ -13,7 +13,7 @@ import android.widget.Spinner;
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
-    public static  final String NOTE_POSITION = "com.get2abdul101.notekeeper.NOTE_POSITION";
+    public static final String NOTE_POSITION = "com.get2abdul101.notekeeper.NOTE_POSITION";
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private Boolean isNewNote;
@@ -44,22 +44,23 @@ public class NoteActivity extends AppCompatActivity {
         textNoteText = findViewById(R.id.text_note_body);
 
         if (!isNewNote)
-        displayNote(spinnerCourses, textNoteTitle, textNoteText);
+            displayNote(spinnerCourses, textNoteTitle, textNoteText);
 
     }
 
     private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
-       List<CourseInfo> course = DataManager.getInstance().getCourses();
-       int courseIndex = course.indexOf(mNote.getCourse());
-spinnerCourses.setSelection(courseIndex);
+        List<CourseInfo> course = DataManager.getInstance().getCourses();
+        int courseIndex = course.indexOf(mNote.getCourse());
+        spinnerCourses.setSelection(courseIndex);
         textNoteTitle.setText(mNote.getTitle());
-        textNoteText.setText(mNote.getText() );
+        textNoteText.setText(mNote.getText());
 
     }
 
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        isNewNote = position == POSITION_NOT_SET;
 
         if (!isNewNote)
             mNote = DataManager.getInstance().getNotes().get(position);
@@ -100,9 +101,9 @@ spinnerCourses.setSelection(courseIndex);
 
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc2822");
-        intent.putExtra(Intent.EXTRA_SUBJECT, subject );
-        intent.putExtra(Intent.EXTRA_TEXT, body );
-
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, body);
+        startActivity(intent);
 
 
     }
