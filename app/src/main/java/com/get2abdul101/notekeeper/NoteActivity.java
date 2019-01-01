@@ -21,6 +21,7 @@ public class NoteActivity extends AppCompatActivity {
     private EditText textNoteTitle;
     private EditText textNoteText;
     private int newPosition;
+    private boolean mIsCancelling;
 
 
     @Override
@@ -61,6 +62,12 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if(mIsCancelling){
+            if (isNewNote) {
+                DataManager.getInstance().removeNote(newPosition);
+            }
+        }
+        else
         saveNote();
     }
 
@@ -109,6 +116,10 @@ public class NoteActivity extends AppCompatActivity {
             sendMail();
             return true;
 
+            }
+        else if (id == R.id.action_cancel) {
+            mIsCancelling = true;
+            finish();
 
         }
 
