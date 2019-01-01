@@ -17,6 +17,9 @@ public class NoteActivity extends AppCompatActivity {
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private Boolean isNewNote;
+    private Spinner spinnerCourses;
+    private EditText textNoteTitle;
+    private EditText textNoteText;
 
 
     @Override
@@ -27,7 +30,7 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        Spinner spinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
+        spinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapterCourses =
@@ -37,8 +40,8 @@ public class NoteActivity extends AppCompatActivity {
 
         readDisplayStateValue();
 
-        EditText textNoteTitle = findViewById(R.id.text_note_title);
-        EditText textNoteText = findViewById(R.id.text_note_body);
+        textNoteTitle = findViewById(R.id.text_note_title);
+        textNoteText = findViewById(R.id.text_note_body);
 
         if (!isNewNote)
         displayNote(spinnerCourses, textNoteTitle, textNoteText);
@@ -77,10 +80,30 @@ spinnerCourses.setSelection(courseIndex);
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_send_mail) {
+
+            sendMail();
             return true;
+
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendMail() {
+        CourseInfo course = (CourseInfo) spinnerCourses.getSelectedItem();
+
+        String subject = textNoteTitle.getText().toString();
+        String body = "Check out what i learnt\" "
+                + course.getTitle() + "\n" + textNoteText.getText().toString();
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("message/rfc2822");
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject );
+        intent.putExtra(Intent.EXTRA_TEXT, body );
+
+
+
     }
 }
