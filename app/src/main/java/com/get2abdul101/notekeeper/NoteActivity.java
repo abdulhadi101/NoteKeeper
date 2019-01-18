@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -13,7 +14,11 @@ import android.widget.Spinner;
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
+    private final String TAG = getClass().getSimpleName();
     public static final String NOTE_POSITION = "com.get2abdul101.notekeeper.NOTE_POSITION";
+    public static final String ORIGINAL_NOTE_COURSE_ID = "com.get2abdul101.notekeeper.ORIGINAL_NOTE_COURSE_ID";
+    public static final String ORIGINAL_NOTE_TITLE = "com.get2abdul101.notekeeper.ORIGINAL_NOTE_TITLE";
+    public static final String ORIGINAL_NOTE_TEXT = "com.get2abdul101.notekeeper.ORIGINAL_NOTE_TEXT";
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private Boolean isNewNote;
@@ -26,6 +31,14 @@ public class NoteActivity extends AppCompatActivity {
     private String originalNoteTitle;
     private String originalNoteText;
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+         super.onSaveInstanceState(outState);
+    outState.putString(ORIGINAL_NOTE_COURSE_ID, originalNoteCourseId);
+    outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
+    outState.putString(ORIGINAL_NOTE_TEXT, originalNoteText);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +48,7 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        spinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
+        spinnerCourses =  findViewById(R.id.spinner_courses);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapterCourses =
@@ -45,15 +58,26 @@ public class NoteActivity extends AppCompatActivity {
 
         readDisplayStateValue();
 
-        saveOriginalNoteValue();
+        if(savedInstanceState == null)
+        {
+        saveOriginalNoteValue();}
+        else
+            restoreOriginalNoteValue(savedInstanceState);
 
         textNoteTitle = findViewById(R.id.text_note_title);
         textNoteText = findViewById(R.id.text_note_body);
 
         if (!isNewNote)
             displayNote(spinnerCourses, textNoteTitle, textNoteText);
-
+        Log.d(TAG, "onCreate: ");
     }
+
+    private void restoreOriginalNoteValue(Bundle savedInstanceState) {
+        originalNoteCourseId = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
+        originalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
+        originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
+    }
+
 
     private void saveOriginalNoteValue() {
         if(isNewNote)
@@ -61,6 +85,7 @@ public class NoteActivity extends AppCompatActivity {
         originalNoteCourseId = mNote.getCourse().getCourseId();
         originalNoteTitle = mNote.getTitle();
         originalNoteText = mNote.getText();
+        Log.d(TAG, "saveOriginalNoteValue: ");
     }
 
 
@@ -85,6 +110,8 @@ public class NoteActivity extends AppCompatActivity {
         }
         else
         saveNote();
+
+        Log.d(TAG, "onPause");
     }
 
     private void storePreviousNoteValue() {
@@ -105,20 +132,20 @@ public class NoteActivity extends AppCompatActivity {
 
     private void readDisplayStateValue() {
         Intent intent = getIntent();
-        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
-        isNewNote = position == POSITION_NOT_SET;
+         newPosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        isNewNote = newPosition == POSITION_NOT_SET;
 
         if (isNewNote) {
             createNewNote();
 
-        } else
-            mNote = DataManager.getInstance().getNotes().get(position);
+        }
+            mNote = DataManager.getInstance().getNotes().get(newPosition);
     }
 
     private void createNewNote() {
         DataManager dm = DataManager.getInstance();
         newPosition = dm.createNewNote();
-        mNote = dm.getNotes().get(newPosition);
+      //  mNote = dm.getNotes().get(newPosition);
     }
 
     @Override
